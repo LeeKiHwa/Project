@@ -1,0 +1,34 @@
+a = int(input("모드를 선택하세요(0:암호화/1:복호화) : "))
+if a == 0:
+    inFp = open("C:/temp/plain.txt",'r',encoding='utf-8')
+    outFp = open("C:/temp/crypto.txt",'w',encoding='utf-8')
+else:
+    inFp = open("C:/temp/crypto.txt", 'r', encoding='utf-8')
+    outFp = open("C:/temp/plain.txt", 'w', encoding='utf-8')
+
+if a == 0:
+    while True:
+        inStr = inFp.readline()
+        if inStr =="":
+            break
+        for i in inStr:
+            if 'a'<=i<='w' or 'A'<=i<='W' :
+                ct = chr(ord(i)+3)
+            elif 'x'<=i<='z' or 'X'<=i<='Z' :
+                ct = chr(ord(i)-23)
+            else:
+                ct = i
+            outFp.write(ct)
+else:
+    while True:
+        inStr = inFp.readline()
+        if inStr =="":
+            break
+        for i in inStr:
+            if 'a'<=i<='c' or 'A'<=i<='C' :
+                ct = chr(ord(i)+23)
+            elif 'd'<=i<='z' or 'D'<=i<='Z' :
+                ct = chr(ord(i)-3)
+            else:
+                ct = i
+            outFp.write(ct)
