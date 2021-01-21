@@ -1,0 +1,97 @@
+import random
+
+class Player:
+    cards = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
+    points = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
+
+    def __init__(self, name):
+        self.name = name
+        self.hand = []
+        self.score = 0
+        self.get_card()
+        self.get_card()
+
+    def get_card(self):
+        card = random.choice(self.cards)
+        self.hand.append(card)
+
+    def handle_ace(self):
+        points = self.score
+        if points + 11 > 21:
+            ace = 1
+        else:
+            ace = 11
+        return ace
+
+    def get_score(self):
+        points = 0
+        for card in self.hand:
+            if card == 'A':
+                point = self.handle_ace()
+            else:
+                index = Player.cards.index(card)
+                point = Player.points[index]
+            points += point
+        self.score = points
+        return points
+
+    def show_card(self):
+        print("[%s]: " % self.name, end="")
+        for value in self.hand:
+            print("'%s'" % value, end=", ")
+        print()
+
+    def show_defeat(self):
+        print('%s는 %d점으로 패배했습니다.' % (self.name, self.score))
+
+    def show_win(self):
+        print('%s는 %d점으로 승리했습니다.' % (self.name, self.score))
+
+
+# Main
+print(f"{'Blackjack!':=^45}")
+
+computer = Player('Computer')
+user = Player('User')
+
+print("[Computer]: '%s', '*'" % (computer.hand[0]))
+print("[User]: '%s', '%s'" % (user.hand[0], user.hand[1]))
+
+while True:
+    score = user.get_score()
+    print(f"{'현재 점수: [%s]':=^45}" % score)
+    if score >= 21:
+        break
+
+    choice = int(input("카드를 더 받으시겠습니까?(0=No, 1=Yes): "))
+    if not choice:
+        break
+
+    user.get_card()
+    user.show_card()
+# 사용자 카드 받기 종료
+
+if user.score > 21:
+    user.show_defeat()
+    computer.show_card()
+else:
+    computer.show_card()
+    while True:
+        score = computer.get_score()
+        print(f"{'컴퓨터의 점수: [%s]':=^45}" % score)
+
+        if score >= 17:
+            break
+
+        computer.get_card()
+        computer.show_card()
+
+    if computer.score > 21:
+        user.show_win()
+    elif computer.score == user.score:
+        print('Computer와 User는 %d점으로 비겼습니다.' % (user.score))
+    else:
+        if computer.score > user.score:
+            computer.show_win()
+        else:
+            user.show_win()
