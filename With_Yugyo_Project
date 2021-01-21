@@ -1,0 +1,356 @@
+#include "Adafruit_VL53L0X.h"
+#include <stdlib.h>
+
+// 멀티 센서가 있으면 주소를 할당한다.
+#define ad1 0x30
+#define ad2 0x31
+#define ad3 0x32
+#define ad4 0x33
+#define ad5 0x34
+// 핀 할당하기
+#define Sensor1 2
+#define Sensor2 3
+#define Sensor3 4
+#define Sensor4 5
+#define Sensor5 6
+// vl53l0x를 위한 객체 선언
+Adafruit_VL53L0X lox1 = Adafruit_VL53L0X();
+Adafruit_VL53L0X lox2 = Adafruit_VL53L0X();
+Adafruit_VL53L0X lox3 = Adafruit_VL53L0X();
+Adafruit_VL53L0X lox4 = Adafruit_VL53L0X();
+Adafruit_VL53L0X lox5 = Adafruit_VL53L0X();
+// 측정하게 하는 코드
+VL53L0X_RangingMeasurementData_t measure1;
+VL53L0X_RangingMeasurementData_t measure2;
+VL53L0X_RangingMeasurementData_t measure3;
+VL53L0X_RangingMeasurementData_t measure4;
+VL53L0X_RangingMeasurementData_t measure5;
+VL53L0X_RangingMeasurementData_t Value[] = { measure1 , measure2, measure3, measure4, measure5 };  // 근접 센서 배열
+
+//멜로디 핀 할당
+int speak = 7;
+int melody[] = { 523, 698, 831, 1047, 0 };
+int damper[] = { 150, 150, 150, 300, 1200 };
+int melody_size = 5;
+
+//멜로디 함수
+int ding() {
+    Serial.println(F("벨 울림"));
+    for (int a = 0; a < 4; a++)
+    {
+        tone(speak, melody[a], damper[a]); // 각 음계와 유지시간으로 스피커 연주
+        delay(damper[a] + 100); // 유지시간+100ms 만큼 대기하여 연주 박자 유지
+    }
+}
+
+//시간 변수
+unsigned long millisTime = 0;
+//시간 초기화 할때 필요한 변수
+extern volatile unsigned long timer0_millis;
+// 받은 데이터 개수
+int check_receive = 0; 
+//센서 값 배열, 범위 배열, 스위치 배열
+int range[] = { 20, 30, 40, 50, 60 };
+int Switch[2];
+
+void setID() {
+    // 전체 리셋
+    digitalWrite(Sensor1, LOW);
+    digitalWrite(Sensor2, LOW);
+    digitalWrite(Sensor3, LOW);
+    digitalWrite(Sensor4, LOW);
+    digitalWrite(Sensor5, LOW);
+    //delay(10);
+    digitalWrite(Sensor1, HIGH);
+    digitalWrite(Sensor2, HIGH);
+    digitalWrite(Sensor3, HIGH);
+    digitalWrite(Sensor4, HIGH);
+    digitalWrite(Sensor5, HIGH);
+    //delay(10);
+    // 센서1 활성화하고 나머지 리셋
+    digitalWrite(Sensor1, HIGH);
+    digitalWrite(Sensor2, LOW);
+    digitalWrite(Sensor3, LOW);
+    digitalWrite(Sensor4, LOW);
+    digitalWrite(Sensor5, LOW);
+    // 센서1 초기화
+    if (!lox1.begin(ad1)) {
+        Serial.println(F("첫번째 센서 부팅 실패"));
+        while (1);
+    }
+    //delay(10);
+    // 센서2 활성화
+    digitalWrite(Sensor2, HIGH);
+    //delay(10);
+    //센서2 초기화
+    if (!lox2.begin(ad2)) {
+        Serial.println(F("두번째 센서 부팅 실패"));
+        while (1);
+    }
+    // 센서3 활성화
+    digitalWrite(Sensor3, HIGH);
+    //delay(10);
+    //센서3 초기화
+    if (!lox3.begin(ad3)) {
+        Serial.println(F("세번째 센서 부팅 실패"));
+        while (1);
+    }
+    // 센서4 활성화
+    digitalWrite(Sensor4, HIGH);
+    //delay(10);
+    //센서4 초기화
+    if (!lox4.begin(ad4)) {
+        Serial.println(F("네번째 센서 부팅 실패"));
+        while (1);
+    }
+    // 센서5 활성화
+    digitalWrite(Sensor5, HIGH);
+    //delay(10);
+    //센서5 초기화
+    if (!lox5.begin(ad5)) {
+        Serial.println(F("다섯번째 센서 부팅 실패"));
+        while (1);
+    }
+}
+void read_dual_sensors() {
+    lox1.rangingTest(&Value[0], false); // pass in 'true' to get debug data printout!
+    lox2.rangingTest(&Value[1], false); // pass in 'true' to get debug data printout!
+    lox3.rangingTest(&Value[2], false); // pass in 'true' to get debug data printout!
+    lox4.rangingTest(&Value[3], false); // pass in 'true' to get debug data printout!
+    lox5.rangingTest(&Value[4], false); // pass in 'true' to get debug data printout!
+    
+    // 첫번째 센서 시리얼 모니터에 출력
+    int val_0 = Value[0].RangeMilliMeter;
+    val_0 -= 10;
+    Value[0].RangeMilliMeter = val_0;
+    for (int i=0; i<5; i++) {
+      Serial.print(i + 1);
+      Serial.print(F(": "));
+
+      if (Value[i].RangeStatus != 4) {     // if not out of range
+          Serial.print(Value[i].RangeMilliMeter);
+      }
+      else {
+          Serial.print(F("범위 초과"));
+      }
+      Serial.print(F(" "));
+    }
+    Serial.println(F(" "));
+    /*
+    Serial.print(F("1: "));
+    if (measure1.RangeStatus != 4) {     // if not out of range
+        Serial.print(measure1.RangeMilliMeter);
+    }
+    else {
+        Serial.print(F("범위 초과"));
+    }
+    Serial.print(F(" "));
+    // 두번째 센서 시리얼 모니터에 출력
+    Serial.print(F("2: "));
+    if (measure2.RangeStatus != 4) {
+        Serial.print(measure2.RangeMilliMeter);
+    }
+    else {
+        Serial.print(F("범위 초과"));
+    }
+    Serial.print(F(" "));
+    // 세번째 센서 시리얼 모니터에 출력
+    Serial.print(F("3: "));
+    if (measure3.RangeStatus != 4) {
+        Serial.print(measure3.RangeMilliMeter);
+    }
+    else {
+        Serial.print(F("범위 초과"));
+    }
+    Serial.print(F(" "));
+    // 네번째 센서 시리얼 모니터에 출력
+    Serial.print(F("4: "));
+    if (measure4.RangeStatus != 4) {
+        Serial.print(measure4.RangeMilliMeter);
+    }
+    else {
+        Serial.print(F("범위 초과"));
+    }
+    Serial.print(F(" "));
+    // 다섯번째 센서 시리얼 모니터에 출력
+    Serial.print(F("5: "));
+    if (measure5.RangeStatus != 4) {
+        Serial.print(measure5.RangeMilliMeter);
+    }
+    else {
+        Serial.print(F("범위 초과"));
+    }
+    Serial.println();
+    */
+    for (int i = 0; i <= 4; i++) {
+        Serial.print(i+1);
+        Serial.print(": ");
+        Serial.print(range[i]);
+        Serial.print(" ");
+    }
+    Serial.println("");
+    Serial.println("");
+    Serial.println("");
+    Serial.println("");
+    Serial.println("");
+}
+
+//시간 관련 변수
+int state = LOW;
+int reading;
+int previous = LOW;
+unsigned long time = 0;
+long debounce = 100;
+
+void setup() {
+    //시리얼 통신 보드레이트 : 9600
+    Serial.begin(9600);
+    Serial3.begin(9600);
+    // 연결할때 까지 대기
+    while (!Serial) {
+        delay(1);
+    }
+    //센서 OUTPUT으로 핀모드 할당
+    pinMode(Sensor1, OUTPUT);
+    pinMode(Sensor2, OUTPUT);
+    pinMode(Sensor3, OUTPUT);
+    pinMode(Sensor4, OUTPUT);
+    pinMode(Sensor5, OUTPUT);
+    /*Serial.println(F("차단된 핀이 존재"));*/
+    //센서 기본 설정
+    digitalWrite(Sensor1, LOW);
+    digitalWrite(Sensor2, LOW);
+    digitalWrite(Sensor3, LOW);
+    digitalWrite(Sensor4, LOW);
+    digitalWrite(Sensor5, LOW);
+    Serial.println("초기화중...");
+    Serial.println("시작중...");
+    setID();
+
+    //스피커모듈 핀 할당
+    pinMode(speak, OUTPUT);
+    //택트스위치 핀 할당  
+    for (int i = 49; i <= 53; i++) {
+        pinMode(i, INPUT);
+    }
+    //LED핀 할당
+    pinMode(13, OUTPUT);
+    //시작 버튼
+    pinMode(12, INPUT_PULLUP);
+
+}
+
+void loop() {
+    //int Value[] = { measure1.RangeMilliMeter, measure2.RangeMilliMeter, measure3.RangeMilliMeter, measure4.RangeMilliMeter, measure5.RangeMilliMeter };  // 근접 센서 배열
+
+    
+    read_dual_sensors();
+    
+    //택트 스위치 누르면 a,b,c,d,e 전송
+    if (digitalRead(49) == HIGH) {
+        Serial3.print("a");
+    }
+    if (digitalRead(50) == HIGH) {
+        Serial3.print("b");
+    }
+    if (digitalRead(51) == HIGH) {
+        Serial.println("상태 ON");
+        Serial3.print("c");
+    }
+    if (digitalRead(52) == HIGH) {
+        Serial3.print("d");
+    }
+    if (digitalRead(53) == HIGH) {
+        Serial3.print("e");
+    }
+
+    // 근접 센서 값이 55 이상이면 0으로 변환
+    
+    for (int i=0; i<5; i++) {
+      Serial.print(i + 1);
+      Serial.print(F(": "));
+
+      if (Value[i].RangeStatus != 4) {     // if not out of range
+          Serial.print(Value[i].RangeMilliMeter);
+      }
+      else {
+          Serial.print(F("범위 초과"));
+      }
+      Serial.print(F(" "));
+    }
+    Serial.println(F(" "));
+    
+    for (int i = 0; i < 5; i++) {
+        if (Value[i].RangeMilliMeter >= 95) {
+            Value[i].RangeMilliMeter = 0;
+        }
+    }
+    //택트 스위치 ON/OFF
+    reading = digitalRead(12);
+    if (reading == HIGH && previous == LOW && millis() - time > debounce) {
+        if (state == HIGH) {
+            state = LOW;
+        }
+        else {
+            state = HIGH;
+        }
+
+        time = millis();
+    }
+    previous = reading;
+
+    //0이면 ON 1이면 OFF 상태 (시리얼 모니터에 상태 값 출력)
+    Serial.print("상태 : ");
+    Serial.println(state);
+
+    //상태 0
+    if (state == LOW) {                     //ON상태
+        millisTime = millis() / 1000;       //1초씩 증가
+        Serial.print("TIME : ");
+        Serial.println(millisTime);
+        int Bool = 0;                       //Bool은 정답이면 자연수, 정답이 아니면 0
+        if (millisTime >= 5) {                  //10초가 넘어서부터 센서값이 맞는지 아닌지를 체크
+            for (int i = 0; i < 5; i++) {
+                //int a = Value[i];
+                //Bool = Check(a);                //Bool 값은 Chack함수 반환 값을 저장한다.
+                //범위 값과 범위 값+6으로 범위 값인지 아닌지 구하기
+                Serial.print(Value[i].RangeMilliMeter);
+                Serial.print(" / ");
+                Serial.println(range[i]);
+                int Sensor_value = Value[i].RangeMilliMeter;
+                
+                if (Sensor_value >= range[i] && Sensor_value < range[i] + 10) {
+                    ding();
+                    Bool = i + 1;   //Bool값은 정답 값을 저장한다.
+                }
+                
+            }
+        }
+        Serial3.println(Bool);
+        //LED 켜짐
+        digitalWrite(13, HIGH);
+    }
+    //상태 1 (기본상태)
+    else if (state == HIGH) {   //OFF상태
+        timer0_millis = 0;      //millis 시간을 초기화 시켜준다.
+        //LED 꺼짐
+        digitalWrite(13, LOW);
+    }
+    //시리얼 통신 (수신)
+    if (Serial3.available()) {
+        char inByte = Serial3.read();
+        Serial.print("받은 값 : ");
+        Serial.println(inByte);
+
+        int int_inByte = inByte;
+        Switch[check_receive] = (int_inByte - 1) - 48;
+        Serial.println(Switch[check_receive]);
+        check_receive++;
+    }
+    if (check_receive == 2) {
+        int bal = range[Switch[1]];
+        range[Switch[1]] = range[Switch[0]];
+        range[Switch[0]] = bal;
+        check_receive = 0;
+    }
+}
