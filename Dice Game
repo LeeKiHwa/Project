@@ -1,0 +1,446 @@
+import random
+##함수선언
+
+##변수선언
+#사용자파트 변수선언
+chance=0    #첫번째로 주사위를 굴릴땐 0이고 그 다음에는 주사위를 더 돌릴지 말지를 식별하는 변수
+user=0      #사용자의 주사위 값
+User=[]     #사용자의 주사위 값이 저장될 리스트
+count=0     #주사위는 총 3번만 돌릴 수 있으므로 몇번째 돌렸는지 알 수 있는 변수
+u_n=0       #사용자가 주사위를 몇개 변경할 지를 입력하는 변수
+cnt=0       #u_n만큼을 변경해야 하므로 u_n만큼만 변경할수 있도록 하는 변수
+u=0         #사용자가 주사위 몇번째 자리를 변경할지를 적는 변수
+delete=[]   #사용자가 몇번째 자리의 주사위를 변경할지가 저장되어 있는 리스트
+number=0    #몇번째 자리의 리스트값을 제거해야하는데 제거할 때마다 위치가 변경되므로 그 위치를 바로잡기 위한 변수
+#컴퓨터파트 변수선언
+com=0       #컴퓨터의 주사위 값
+Com=[]      #컴퓨터의 주사위 값이 저장될 리스트
+com_chk=0   #주사위는 총 3번만 돌릴 수 있으므로 몇번째 돌렸는지 알 수 있는 변수
+com_number=0#컴퓨터가 조건들을 통해 제거된 후의 나머지 주사위들의 갯수를 저장하는 변수
+Big=0       #컴퓨터의 주사위 리스트에서 동일한 주사위들의 갯수를 저장하는 변수
+count_4=0   #주사위가 4개 반복될 시 무슨 숫자가 반복되는 지를 저장하는 변수
+number_3=0  #주사위가 3개 반복될 시 무슨 숫자가 반복되는 지를 저장하는 변수            P.S 변수가 일괄되지 않네요..ㅠ
+count_2=0   #주사위가 2개 같은게 몇개인지를 저장하는 변수
+number__2=[]#주사위가 33441일 경우 즉, 동일한숫자가 2개가 2쌍있을때, 무슨 숫자가 동일한지를 저장하는 리스트 즉,[3,4]가 저장된다.
+chk=0       #주사위가 3개 동일할 경우 chk값을 3으로 저장하기 위해 있는 변수
+count_0=0   #주사위가 동일한 게 없을 때마다 count_0을 1씩 증가한다.
+##사용자 파트//
+while (True):
+    number,u_n,cnt=0,0,0 ;delete=[]
+    print('주사위를 굴립니다.')
+    #첫번째로 주사위 굴릴 때,//
+    if chance==0:                           #첫번째 판은 무조건 5개 주사위를 돌려야한다 chance가 0이면 첫번째 주사위 굴리는 것
+        for i in range(0,5):
+            user=random.randrange(1,7)
+            User.append(user)
+    #두,세번째로 주사위 굴릴 때,//
+    else:                         #주사위를 더 돌리려면 chance에 1을 넣어야하므로 1일때는 5번의 갯수중 User의 항목을 뺀 값만큼을 다시 User에 보충한다.
+        user_number=len(User)
+        for i in range(0,5-user_number):
+            user=random.randrange(1,7)
+            User.append(user)
+    User.sort()                             #가독성이 좋게 크기순으로 정렬을 한다.
+    #주사위를 세번 다 돌렸을 때,//
+    if count==2:                            #count가 3번 즉, 3번의 주사위를 돌렸다면 기회는 사라지므로 반복문을 탈출
+        break
+    print('돌리기 결과 값은==>',User)
+    #주사위를 더 돌릴지 말지 정하는 파트//
+    chance=int(input('주사위를 더 돌리시려면 숫자 1, 그만두려면 2번을 선택하세요'))   #chance가 1일시, 한번더 주사위를 돌린다.
+    if chance==2:                                                               #chance가 2이면 반복문 탈출
+        break
+    for j in range(0,5):                    #몇번째를 지울지를 물어보기 위해서 각 칸마다 번호를 매겨준다 0번째부터 4번째까지
+        print('(',j,'번째:',User[j],end=')')
+    print('')
+    #사용자가 주사위를 몇개 변경할 지를 적는 파트//
+    while(True):
+        u_n=int(input('주사위를 몇개 변경할 지 적어주세요.==>'))
+        if u_n<=0 or u_n>5:                                            #u_n이 0과 같거나 작고, 5보다 클경우 다시 입력하게 한다.(경고)
+            print('총 5개 변경가능 합니다. 다시 입력하여 주세요')
+            continue
+        else:
+            break
+    #사용자가 주사위들 중 몇번째 자리를 변경할 지를 적는 파트//
+    while (True):
+        if cnt>=u_n:                                #몇번째 변경할지를 입력받을 때마다 카운트를 세서 카운트가 u_n(사용자가 원하는 값)과 같아질 때 반복문을 나간다.
+            print('더 이상 변경하실 수 없습니다.')
+            break
+        u=int(input('주사위 몇번째를 변경할 지 적어주세요.==>'))    #주사위의 몇번째 자리를 변경할 지를 입력 받는다.
+        if u<0 or u>4 :
+            print('0~4까지의 수만 적어주세요')       #0번째에서 4번째 자리까지만 있으므로 그 자리가 아닐 시, 다시 입력하게 한다.
+            continue
+        else:                                       #바꿀 자리를 또 적을 시, 중복처리 되었으므로 continue를 통해 다시 바꿀 자리를 선택하게 한다.
+            if u in delete:
+                print('중복된 자리를 입력하셨습니다. 다시 입력하여 주세요')
+                continue
+            else:                                   #모든 조건이 완벽할 시 delete라는 리스트에 바꿀 자릿수를 저장한다.
+                delete.append(u)                    #그리고 delete라는 리스트에 추가될 때마다 카운트를 하나 씩 더한다.(사용자가 원하는 u_n만큼만 바꾸고 나가기 위해)
+                cnt+=1
+    delete.sort()                                   #delete리스트를 정렬한 뒤, 갯수를 delete_number에 저장한다.
+    delete_number=len(delete)
+    for i in range(0,delete_number):                #그리고 항목이 하나 제거될 때마다 갯수가 적어지니 없어질 때마다 number만큼을 제거해줘야 한다.
+        del(User[delete[i]-number])
+        number+=1
+    count+=1
+if count==2:                                        #총 3번의 던지는 기회를 다 쓸 경우 경고를 해준 뒤 반복문을 나간다.
+    print('기회를 다 사용하셨습니다.')
+print('사용자의 주사위 돌린 결과 값은==>',User)      #최종적으로 사용자가 던진 주사위의 값을 출력한다.
+
+
+
+##컴퓨터 파트
+while com_chk<2 :                                   #컴퓨터도 마찬가지로 3번의 기회를 다 사용할 경우 반복문을 나간다.
+    com,number_3,chk,count_2,count_0=0,0,0,0,0
+    number__2=[]
+    if com_chk==0:                                  #첫번째는 무조건 5번을 던져야 하므로 com_chk의 기본값이 0이므로 5번 반복(그 뒤는 com_chk값이 증가하므로 다시 쓸 일X)
+        for i in range(0,5):
+            com=random.randrange(1,7)
+            Com.append(com)
+    elif com_chk !=0:                               #그 뒤에 com_chk값은 1씩 더해진다. 그리고 밑의 조건에서 남은 갯수를 5에서 조건에 걸린 주사위들을 뺀뒤, 남은 자리를 다시 랜덤으로 돌린다
+        com_number=len(Com)
+        for hh in range(0,5-com_number):
+            com=random.randrange(1,7)
+            Com.append(com)
+    Com.sort()
+    for j in range(1,7):                        #주사위 다섯개가 동일 할시 주사위를 더 돌릴 필요가 없으므로 반복 종료
+        Big=Com.count(j)
+        if Big == 5:
+            break
+        elif Big==4:                            #주사위가 4개 동일한게 무슨 숫자인지를 count_4에 저장
+            count_4=j
+    if Big ==5:
+        break
+    elif Big==4:                            #주사위 네개가 동일 할시 리스트를 비운후, count_4에 저장되어 있는 숫자 4개를 다시 리스트에 저장
+        Com=[]
+        for grow in range(0,4):
+            Com.append(count_4)
+    for k in range(1,7):                        #주사위가 3개가 동일 할 경우, chk를 3으로 저장한뒤 3개 동일한게 무슨 숫자인지를 number_3에 저장
+        Big=Com.count(k)
+        if Big==3:
+            number_3=k
+            chk=3
+        elif Big==2:
+            count_2+=1                          #주사위가 2개 동일한게 몇개 있는지를 count_2에 저장한다.
+            number__2.append(k)                 #동일한 주사위의 숫자를 number__2에 저장한다.
+        elif Big==1:                            #동일한게 없을때마다, count_0의 값은 1씩 올라간다.
+            count_0+=1
+    if chk==3:                                  #주사위가 3개 동일할 경우 Com리스트를 초기화 한 후, 무엇이 3개가 반복되는지는 number_3에 저장되어있으므로
+        Com=[]                                  #그 중복되는 숫자(number_3에 저장되어있음)만 3개 저장한다.
+        for m in range(0,3):
+            Com.append(number_3)
+    if count_2 ==2:                             #주사위가 동일한게 2개일 경우 Com리스트를 초기화 한 뒤, 무엇이 동일한지는 number__2에 저장되어 있고
+        Com=[]                                   # 그 리스트를 정렬시키면 ([0],[1]자리중)첫번째 칸이 제일 큰것이므로 그것만 2개를 저장한다.
+        number__2.sort()
+        for mm in range(0,2):
+            Com.append(number__2[1])
+    elif count_2 ==1 and chk!=3 :               #주사위 2개가 동일하고 나머지가 다를경우 (chk==3이면 3개가 동일할 경우니까)
+        Com=[]                                     #Com리스트를 초기화 한 후, 중복되는 결과 값이 number__2에 저장되어 있으므로 0번째 값을 2개 저장한다.
+        for ll in range(0,2):
+            Com.append(number__2[0])
+    elif count_0 >= 5:                            #주사위가 동일한 것이 없을 경우는 count_0이 5일 경우
+        for kk in range(0,3):                   #즉, 정렬이 된 것이므로 앞에 숫자만 제거하면 되고 제거할수록 항목은 줄어드니까 0번째 항목만 제거하면 된다.
+            del(Com[0])
+    com_chk+=1
+if com_chk==2:                                  #모든 컴퓨터의 주사위 던지기가 끝난 뒤, 끝날 때, 제거한 결과 값만 나오므로 3번의 기회를 다 쓴 뒤에 나오면
+    com_number=len(Com)                          #위의 반복문과 같이 나머지를 추가해준다.
+    for hh in range(0,5-com_number):
+        com=random.randrange(1,7)
+        Com.append(com)
+    Com.sort()
+    print('컴퓨터의 주사위 돌린 결과 값은==>',Com)
+else:                                               #만약 3번의 기회전에 5개나 4개가 동일할 경우에 나왔을 시에는 그냥 정렬만 한뒤 보여준다.
+    Com.sort()
+    print('컴퓨터의 주사위 돌린 결과 값은==>',Com)
+
+
+##승패판정
+#승패판정 변수선언
+Com_dice=0      #Com리스트에 있는 숫자 중 동일한게 몇개 있는지를 저장하는 변수
+Com_score=0     #컴퓨터의 점수저장 변수
+Com_5=0         #컴퓨터의 주사위가 5개 다 동일할 때, 무슨 숫자가 동일한지가 저장되어 있는 변수
+Com_4=0         #컴퓨터의 주사위가 4개 동일할 때, 무슨 숫자가 동일한지가 저장되어 있는 변수
+Com_3=0         #컴퓨터의 주사위가 3개 동일할 때, 무슨 숫자가 동일한지가 저장되어 있는 변수
+Com_dice_3=''   #컴퓨터의 주사위가 3개 동일할 경우를 True로 저장하기 위해 있는 변수
+Com_dice_2=''   #컴퓨터의 주사위가 2개 동일할 경우를 True로 저장하기 위해 있는 변수
+Com_dice_1=''   #컴퓨터의 주사위가 동일한게 없는 경우일 때, True로 저장하기 위해 있는 변수
+Com_dice_num2=0 #컴퓨터가 2개 동일한게 몇개있는지를 저장하는 변수
+Com_dice_num1=0 #컴퓨터가 동일한게 없을 때마다 1씩 증가하는 변수
+Com_dice2=[]    #컴퓨터의 숫자가 2개 동일할 때, 그 숫자를 저장하는 리스트
+
+User_dice=0     #User리스트에 있는 숫자 중 동일한게 몇개 있는지를 저장하는 변수
+User_score=0    #사용자의 점수저장 변수
+User_5=0        #사용자의 주사위가 5개 다 동일할 때, 무슨 숫자가 동일한지가 저장되어 있는 변수
+User_4=0        #사용자의 주사위가 4개 동일할 때, 무슨 숫자가 동일한지가 저장되어 있는 변수
+User_3=0        #사용자의 주사위가 3개 동일할 때, 무슨 숫자가 동일한지가 저장되어 있는 변수
+User_dice_3=''  #사용자의 주사위가 3개 동일할 경우를 True로 저장하기 위해 있는 변수
+User_dice_2=''  #사용자의 주사위가 2개 동일할 경우를 True로 저장하기 위해 있는 변수
+User_dice_1=''  #사용자의 주사위가 동일한게 없는 경우일 때, True로 저장하기 위해 있는 변수
+User_dice_num2=0#사용자가 2개 동일한게 몇개 있는지를 저장하는 변수
+User_dice_num1=0#사용자가 동일한게 없을 때마다 1씩 증가하는 변수
+User_dice2=[]   #사용자의 숫자가 2개 동일할 때, 그 숫자를 저장하는 리스트
+Com.sort() ; User.sort()
+
+##점수 부여 코드
+#컴퓨터편
+for dice in range(1,7):
+    Com_dice=Com.count(dice)
+    if Com_dice==5:             #컴퓨터의 주사위 값 5개가 동일할 때, 10점
+        Com_score=10
+        Com_5=dice              #Com_5에 무슨 숫자가 동일한지 저장
+    elif Com_dice==4:           #컴퓨터의주사위 값 4개가 동일할 때, 9점
+        Com_score=9
+        Com_4=dice              #Com_4에 무슨 숫자가 동일한지 저장
+    elif Com_dice==3:           #컴퓨터가주사위 값 3개가 동일할 시 Com_dice_3가 True
+        Com_dice_3=True
+        Com_3=dice              #Com_3에 무슨 숫자가 동일한지 저장
+    elif Com_dice==2:           #컴퓨터가주사위 값 2개가 동일할 시 Com_dice_2가 True
+        Com_dice_2=True
+        Com_dice_num2+=1        #2개가 동일할 때마다 1씩 증가
+        Com_dice2.append(dice)  #2개 동일한 숫자를 Com_dice2에 저장
+    elif Com_dice==1:           #컴퓨터가주사위 값 1개가 동일할 시 Com_dice_1이 True
+        Com_dice_1=True
+        Com_dice_num1+=1        #동일한 게 없을 때마다 1씩 증가
+#사용자편
+for dice1 in range(1,7):
+    User_dice=User.count(dice1)
+    if User_dice==5:             #사용자의 주사위 값 5개가 동일할 때, 10점
+        User_score=10
+        User_5=dice1             #User_5에 무슨 숫자가 동일한지 저장
+    elif User_dice==4:           #사용자의주사위 값 4개가 동일할 때, 9점
+        User_score=9
+        User_4=dice1             #User_4에 무슨 숫자가 동일한지 저장
+    elif User_dice==3:           #사용자가주사위 값 3개가 동일할 시 User_dice_3가 True
+        User_dice_3=True
+        User_3=dice1             #User_3에 무슨 숫자가 동일한지 저장
+    elif User_dice==2:           #사용자가주사위 값 2개가 동일할 시 User_dice_2가 True
+        User_dice_2=True
+        User_dice_num2+=1        #2개가 동일할 때마다 1씩 증가
+        User_dice2.append(dice1) #2개 동일한 숫자를 User_dice_2에 저장
+    elif User_dice==1:           #사용자가주사위 값 1개가 동일할 시 User_dice_1가 True
+        User_dice_1=True
+        User_dice_num1+=1        #동일한 게 없을 때마다 1씩 증가
+
+if (Com_dice_3==True and Com_dice_2==True) :  #컴퓨터가 3패 2패가 같을시 점수는 8점
+    Com_score=8
+if (User_dice_3==True and User_dice_2==True) :  #사용자가 3패 2패가 같을시 점수는 8점
+    User_score=8
+if Com_dice_num1 ==5 or User_dice_num1 ==5:   #사용자의 패와 컴퓨터의 패가 동일한게 하나도 없을 때,
+    if Com_dice_num1==5:                        #0번째가 1부터 시작해서 연속하면 컴퓨터에게 7점
+        if Com[0]==1:
+            for fire in range(0,5):
+                if Com[fire]==fire+1:
+                    Com_score=7
+                else:                           #숫자가 연속하지 않는다면 컴퓨터에게 3점 부여
+                    Com_score=3
+        elif Com[0]==2:                         #0번째가 2부터 시작해서 연속하면 컴퓨터에게 7점부여
+            for fire2 in range(0,5):
+                if Com[fire2]==fire2+2:
+                    Com_score=7
+                else:                           #숫자가 연속하지 않는다면 3점 부여
+                    Com_score=3
+    if User_dice_num1==5:                       #0번째가 1부터 시작해서 연속하면 사용자에게 7점
+        if User[0]==1:
+            for fire3 in range(0,5):
+                if User[fire3]==fire3+1:
+                    User_score=7
+                else:                           #숫자가 연속하지 않는다면 사용자에게 3점 부여
+                    User_score=3
+        elif User[0]==2:                        #0번째가 2부터 시작해서 연속하면 사용자에게 7점부여
+            for fire4 in range(0,5):
+                if User[fire4]==fire4+2:
+                    User_score=7
+                else:                           #숫자가 연속하지 않는다면 사용자에게 3점 부여
+                    User_score=3
+if Com_dice_3==True and Com_dice_2=='':     #3패같고 2패 다를시 6점 부여
+    Com_score=6                             #3패 같을 시 Com_dice_3은 True 2패가 같지 않을시는 기본값이 적용
+if User_dice_3==True and User_dice_2=='':
+    User_score=6
+if Com_dice_num2==2 :                       #같은 2패가 두쌍일때, 5점부여
+    Com_score=5                             #2패가 같을 때마다 Com_dice_num2가 1씩 증가하므로 2이면 2패중복이 2쌍
+if User_dice_num2==2:
+    User_score=5                            #2패가 같을 때마다 User_dice_num2가 1씩 증가하므로 2이면 2패중복이 2쌍
+
+if User_dice_num2==1 and User_dice_num1==3:     #사용자와 컴퓨터의 패가 2쌍만 같고 나머지가 다를때 4점 부여
+    User_score=4                                #같은게 없을 때마다 User_dice_num1이 증가하므로 다른게 3개고, 2패같은게 1개 있을 때,
+if Com_dice_num2==1 and Com_dice_num1==3:
+    Com_score=4                                 #같은게 없을 때마다 Com_dice_num1이 증가하므로 다른게 3개고, 2패같은게 1개 있을 때,
+
+
+
+##승패판정코드
+if Com_score==10 or User_score==10 :                #사용자와 컴퓨터 둘 중의 하나가 10점일 때, (즉, 5패가 다 같을 때)
+    if Com_score==10 and User_score!=10:            #그 중 컴퓨터만 10점일 때, 컴퓨터 승리
+        print('컴퓨터의 승리')
+    elif Com_score!=10 and User_score==10:          #그 중 사용자만 10점일 때, 사용자 승리
+        print('사용자의 승리')
+    else:                                           #둘 다 10점일 때,
+        if Com_5 > User_5:                          #Com_5(무슨 숫자가 5개가 동일한지가 저장되어 있는 변수)와 User_5를 비교한다 Com_5가 크면 컴퓨터 승리
+            print('컴퓨터의 승리')
+        elif Com_5 < User_5:                        #User_5가 크면 사용자 승리
+            print('사용자의 승리')
+        else:                                       #Com_5와 User_5가 같으면 숫자가 동일하므로 무승부
+            print('무승부')
+
+elif Com_score==9 or User_score==9:                 #사용자와 컴퓨터 둘 중의 하나가 9점일 때,(즉, 4개가 같을 때,)
+    if Com_score==9 and User_score!=9:              #그 중 컴퓨터만 9점일 때, 컴퓨터 승리
+        print('컴퓨터의 승리')
+    elif Com_score!=9 and User_score==9:            #그 중 사용자만 9점일 때, 사용자 승리
+        print('사용자의 승리')
+    else:                                           #둘 다 9점일 때,
+        if Com_4 > User_4:                          #Com_4(무슨 숫자가 4개가 동일한지가 저장되어 있는 변수)와 User_4를 비교한다. Com_4가 크면 컴퓨터 승리
+            print('컴퓨터의 승리')
+        elif Com_4 < User_4:                        #User_4가 크면 사용자 승리
+            print('사용자의 승리')
+        else:                                       #Com_4와 User_4가 같으면 나머지 숫자 하나를 비교해야 한다,
+            for Resseo in range(0,4):               #컴퓨터와 유저의 리스트에서 중복 숫자를 다 제거한다.
+                Com.remove(Com_4)
+            for Resseo2 in range(0,4):
+                User.remove(User_4)
+            if Com[0] > User[0]:                    #숫자가 하나 남았으므로 0번째 자리 비교 컴퓨터가 크면 컴퓨터의 승리
+                print('컴퓨터의 승리')
+            elif Com[0] < User[0]:
+                print('사용자의 승리')                #사용자가 크면 사용자의 승리
+            else:
+                print('무승부')                      #같다면 숫자가 같은 것이므로 무승부
+elif Com_score==8 or User_score==8:                 #사용자와 컴퓨터 둘 중의 하나가 8점일 때,(즉 3개 2개씩 동일할 때)
+    if Com_score==8 and User_score!=8:              #그 중 컴퓨터만 8점일 때, 컴퓨터 승리
+        print('컴퓨터의 승리')
+    elif Com_score!=8 and User_score==8:            #그 중 사용자만 8점일 때, 사용자 승리
+        print('사용자의 승리')
+    else:                                           #둘 다 8점일 때,
+        if User_3 > Com_3:                          #User_3(무슨 숫자가 3개가 동일한지가 저장되어 있는 변수)와 Com_3을 비교한다. User_3이 크면 사용자 승리
+            print('사용자의 승리')
+        elif User_3 < Com_3:                        #Com_3이 크면 컴퓨터 승리
+            print('컴퓨터의 승리')
+        else:                                       #Com_3과 User_3이 같으면 숫자가 동일하므로 User_dice2(2개 중복 값)과 Com_dice2를 비교
+            if User_dice2 < Com_dice2:              #컴퓨터가 크면 컴퓨터 승리
+                print('컴퓨터의 승리')
+            elif User_dice2 > Com_dice2:            #사용자가 크면 사용자 승리
+                print('사용자의 승리')
+            else:                                   #값이 같으면 무승부
+                print('무승부')
+
+elif Com_score==7 or User_score==7:                 #사용자와 컴퓨터 둘 중의 하나가 7점일 때,(즉 5개 연속일 때)
+    if Com_score==7 and User_score!=7:              #그 중 컴퓨터만 7점일 때, 컴퓨터 승리
+        print('컴퓨터의 승리')
+    elif Com_score!=7 and User_score==7:            #그 중 사용자만 7점일 때, 사용자 승리
+        print('사용자의 승리')
+    else:                                           #둘 다 7점일 때,
+        if Com[4]>User[4]:                          #숫자 연속일 경우 12345와 23456밖에 없다 그 땐 제일 큰숫자를 비교하는 것이므로 정렬했을 때, 4번째 오는 값이 크다
+            print('컴퓨터의 승리')                    #즉, 4번째 값이 컴퓨터가 클 때, 컴퓨터 승리
+        elif Com[4]<User[4]:                        #사용자가 크면 사용자 승리
+            print('사용자의 승리')
+        else:                                       #4번째 자리가 같다는 말은 동일하다는 뜻이므로 무승부
+            print('무승부')
+elif Com_score==6 or User_score==6:                 #사용자와 컴퓨터 둘 중의 하나가 6점일 때,(즉, 3개 동일 2개다를 때)
+    if Com_score==6 and User_score!=6:              #그 중 컴퓨터만 6점일 때, 컴퓨터 승리
+        print('컴퓨터의 승리')
+    elif Com_score!=6 and User_score==6:            #그 중 사용자만 6점일 때, 사용자 승리
+        print('사용자의 승리')
+    else:                                           #둘 다 6점일 때,
+        if User_3 > Com_3:                          #User_3(무슨 숫자가 3개가 동일한지가 저장되어 있는 변수)와 Com_3을 비교한다. User_3이 크면 사용자 승리
+            print('사용자의 승리')
+        elif User_3 < Com_3:                        #Com_3이 크면 컴퓨터 승리
+            print('컴퓨터의 승리')
+        else:                                       #3개 동일한 값이 같을 때,
+            for fire5 in range(0,3):                #3개 동일한 값을 3개 제거를 해서 나머지 두개를 비교한다.
+                Com.remove(Com_3)
+            for fire6 in range(0,3):
+                User.remove(User_3)
+            Com.sort();User.sort()                  #정렬을 하면 [0],[1]일 때, 첫번째 자리가 크므로
+            if Com[1] > User[1]:                    #첫번째 자리가 컴퓨터가 클 때, 컴퓨터 승리
+                print('컴퓨터의 승리')
+            elif Com[1] < User[1]:                  #사용자가 클 때, 사용자 승리
+                print('사용자의 승리')
+            else:                                   #첫번째 자리가 같다면 그 다음 자리인 [0]번째 자리를 비교한다.
+                if Com[0]>User[0]:                  #0번째 자리가 컴퓨터가 클 때, 컴퓨터 승리
+                    print('컴퓨터의 승리')
+                elif Com[0]<User[0]:                #사용자가 클 때, 사용자 승리
+                    print('사용자의 승리')
+                else:                               #[0],[1]자리가 다 같다면 숫자가 같은 것이므로 무승부
+                    print('무승부')
+elif Com_score==5 or User_score==5:                 #사용자와 컴퓨터 둘 중의 하나가 5점일 때,(즉, 2개같은게 2쌍)
+    if Com_score==5 and User_score!=5:              #그 중 컴퓨터만 5점일 때, 컴퓨터 승리
+        print('컴퓨터의 승리')
+    elif Com_score!=5 and User_score==5:            #그 중 사용자만 5점일 때, 사용자 승리
+        print('사용자의 승리')
+    else:                                           #둘 다 5점일 때,
+        Com_dice2.sort();User_dice2.sort()          #순서대로 저장은 되어있겠지만 혹시 모르니까 크기순으로 정렬을 해준다.
+        if Com_dice2[1] > User_dice2[1]:            #Com_dice2(무슨 숫자가 2개가 동일한지가 저장되어 있는 리시트)와 User_dice2의 첫번째자리([0],[1])을 비교
+            print('컴퓨터의 승리')                    #컴퓨터가 더 클 경우 컴퓨터 승리
+        elif Com_dice2[1] < User_dice2[1]:
+            print('사용자의 승리')                    #사용자가 더 클 경우 사용자 승리
+        elif Com_dice2[1]==User_dice2[1]:           #첫번째 자리가 같을 경우,
+            if Com_dice2[0] > User_dice2[0]:        #0번째 자리를 비교해서 컴퓨터가 더 크면 컴퓨터 승리
+                print('컴퓨터의 승리')
+            elif Com_dice2[0] < User_dice2[0]:      #사용자가 더 크면 사용자 승리
+                print('사용자의 승리')
+            elif Com_dice2[0] == User_dice2[0]:     #[0],[1]자리가 다 같다면 Com과 User 리스트에서 동일한 숫자를 제거를 한다.
+                for water in range(0,2):
+                    Com.remove(Com_dice2[0])
+                for water2 in range(0,2):
+                    Com.remove(Com_dice2[1])
+                for water3 in range(0,2):
+                    User.remove(User_dice2[0])
+                for water4 in range(0,2):
+                    User.remove(User_dice2[1])
+                if Com[0]>User[0]:                  #그러면 각 리스트에는 하나의 숫자만 저장되어 있으므로 그것만 비교한다.
+                    print('컴퓨터의 승리')            #컴퓨터가 더 크면 컴퓨터 승리
+                elif Com[0]<User[0]:
+                    print('사용자의 승리')            #사용자가 더 크면 사용자 승리
+                else:
+                    print('무승부')                  #그 숫자도 같다면 숫자가 동일한 것이므로 무승부
+
+elif User_score==4 or Com_score==4:             #사용자와 컴퓨터 둘 중의 하나가 4점일 때,(즉, 2개 같은게 1쌍일 때)
+    if User_score==4 and Com_score!=4:          #사용자만 4점일 때, 사용자 승리
+        print('사용자의 승리')
+    elif User_score!=4 and Com_score==4:        #컴퓨터만 4점일 때, 컴퓨터 승리
+        print('컴퓨터의 승리')
+    else:                                       #둘다 4점일 때, Com_dice2(무슨 숫자가 2개가 동일한지 저장되어 있는 리스트)와 User_dice2를 비교
+        if Com_dice2 > User_dice2:
+            print('컴퓨터의 승리')                #컴퓨터가 클시 컴퓨터 승리
+        elif Com_dice2 < User_dice2:
+            print('사용자의 승리')                #사용자가 클시 사용자 승리
+        else:                                   #그 값이 동일하면 중복이 아닌 나머지 3자리를 비교해야한다.
+            for air in range(0,2):              #Com_dice2(무슨 숫자가 2개가 동일한지가 저장되어 있는 리스트;2개만 동일하므로 1개만 저장되어 있다) 중복부분 제거를 한다.
+                Com.remove(Com_dice2[0])
+            for air2 in range(0,2):
+                User.remove(User_dice2[0])
+            Com.sort();User.sort()
+            if Com[2]>User[2]:                      #총 3개의 숫자중 [0],[1],[2]중 두번째 자리 비교
+                print('컴퓨터의 승리')                #컴퓨터가 클 경우 컴퓨터 승리
+            elif Com[2]<User[2]:
+                print('사용자의 승리')                #사용자가 클 경우 사용자 승리
+            else:                                   #두번째 자리 같을 경우 첫번째 자리 비교
+                if Com[1]>User[1]:                  #컴퓨터 클 경우 컴퓨터 승리
+                    print('컴퓨터의 승리')
+                elif Com[1]<User[1]:                #사용자 클 경우 사용자 승리
+                    print('사용자의 승리')
+                else:                               #첫번째 자리 같을 경우 0번째 자리 비교
+                    if Com[0]>User[0]:              #컴퓨터 클 경우 컴퓨터 승리
+                        print('컴퓨터의 승리')
+                    elif Com[0]<User[0]:            #사용자 클 경우 사용자 승리
+                        print('사용자의 승리')
+                    else:                           #[0],[1],[2]가 다 같다면 숫자가 동일한 것이므로 무승부
+                        print('무승부')
+elif User_score==3 or Com_score==3:             #사용자와 컴퓨터 둘 중의 하나가 3점일 때,(즉 숫자가 다 다를때)
+    if User_score==3 and Com_score!=3:          #사용자만 3점일 때, 사용자 승리
+        print('사용자의 승리')
+    elif User_score!=3 and Com_score==3:        #컴퓨터만 3점일 때, 컴퓨터 승리
+        print('컴퓨터의 승리')
+    else:                                       #둘 다 3점일 때,
+        if User[3]>Com[3]:                      #둘 다 3점일 때는 경우의 수가 4개이다. 그리고 0번째와 4번째는 1과 6밖에 안된다.
+            print('사용자의 승리')                #그러므로 나머지 숫자를 비교한다 3번째 자리 비교중 사용자가 크면 사용자 승리
+        elif User[3]<Com[3]:
+            print('컴퓨터의 승리')                #컴퓨터가 크면 컴퓨터 승리
+        else:                                   #3번째 자리가 같다면 2번째 자리 비교
+            if User[2]>Com[2]:
+                print('사용자의 승리')            #사용자가 크다면 사용자 승리
+            elif User[2]<Com[2]:
+                print('컴퓨터의 승리')            #컴퓨터가 크다면 컴퓨터 승리
+            else:                               #2번째 자리가 같다면 1번째 자리 비교
+                if User[1]>Com[1]:
+                    print('사용자의 승리')        #사용자가 크다면 사용자 승리
+                elif User[1]<Com[1]:
+                    print('컴퓨터의 승리')        #컴퓨터가 크다면 컴퓨터 승리
+                else:                           #[0]~[4]가 다 같다면 무승부
+                    print('무승부')
