@@ -1,0 +1,157 @@
+import random
+##변수선언
+turn = [0,1,2,3]            #차례를 나타내는 리스트
+card = ['A','2','3','4','5','6','7','8','9','10','J','Q','K','A','2','3','4','5','6','7','8','9','10','J','Q','K','A','2','3','4','5','6','7','8','9','10','J','Q','K','A','2','3','4','5','6','7','8','9','10','J','Q','K','Jocker']
+trump = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
+player0,player1,player2,player3=[],[],[],[]
+zero_cnt = 0
+##함수선언
+def dup_eli(list0):
+    list1 = list0
+    for i in trump:
+        if list1.count(i) == 2 or list1.count(i) == 3:
+            remove_cnt = 2
+        elif list1.count(i) == 4:
+            remove_cnt = 4
+        else:
+            remove_cnt = 0
+    for j in range(0, remove_cnt):
+        list1.remove(i)
+    return  list1
+
+
+
+##메인코드
+#차례 정하기(순서 섞기)
+random.shuffle(turn)
+
+
+#카드섞기
+random.shuffle(card)
+
+
+#플레이어에게 카드 나누어주기
+for i in turn:
+    cnt = 0
+    if cnt == 0:            #첫번째 플레이어는 14장
+        num = 14
+    else:
+        num = 13
+    if i == 0:
+        player0 = card[0:num]
+        card[0:num] = []
+    elif i == 1:
+        player1 = card[0:num]
+        card[0:num] = []
+    elif i == 2:
+        player2 = card[0:num]
+        card[0:num] = []
+    else:
+        player3 = card[0:num]
+        card[0:num] = []
+
+player0.sort()
+player1.sort()
+player2.sort()
+player3.sort()
+
+while True:
+    #2장씩 겹치는 카드 제거하기
+    player0 = dup_eli(player0)
+    player1 = dup_eli(player1)
+    player2 = dup_eli(player2)
+    player3 = dup_eli(player3)
+
+    #카드를 모두 제거한 사용자 빼기
+    if len(player0) == 0 and 0 in turn:
+        zero_cnt += 1
+        turn.remove(0)
+    elif len(player1) == 0 and 0 in turn:
+        zero_cnt += 1
+        turn.remove(1)
+    elif len(player2) == 0 and 0 in turn:
+        zero_cnt += 1
+        turn.remove(2)
+    elif len(player3) == 0 and 0 in turn:
+        zero_cnt += 1
+        turn.remove(3)
+
+    if zero_cnt == 3:
+        break
+
+    #카트 뽑기
+    for i in turn:
+        if i == 0 :
+            target = (turn.index(0)+1)%(4-zero_cnt)
+            if turn[target]==1:
+                b = len(player1)
+                print("상대방의 카드가 (0~%d)"%(b-1))
+                while True :
+                    a = int(input("몇 번째 카드를 뽑아올건가요? : "))
+                    if 0<=a<=(b-1):
+                        break
+                    print("잘못입력하였습니다.")
+                player0.append(player1[a])
+                player1.remove(player1[a])
+            elif turn[target]==2:
+                b = len(player2)
+                print("상대방의 카드가 (0~%d)" % (b - 1))
+                while True:
+                    a = int(input("몇 번째 카드를 뽑아올건가요? : "))
+                    if 0 <= a <= (b-1):
+                        break
+                    print("잘못입력하였습니다.")
+                player0.append(player2[a])
+                player2.remove(player2[a])
+            else:
+                b = len(player3)
+                print("상대방의 카드가 (0~%d)" % (b - 1))
+                while True:
+                    a = int(input("몇 번째 카드를 뽑아올건가요? : "))
+                    if 0 <= a <= (b-1):
+                        break
+                    print("잘못입력하였습니다.")
+                player0.append(player3[a])
+                player3.remove(player3[a])
+        elif i == 1:
+            target = (turn.index(1) + 1) %(4-zero_cnt)
+            if turn[target] == 0:
+                a = random.choice(player1)
+                player1.append(a)
+                player0.remove(a)
+            elif turn[target] == 2:
+                a = random.choice(player2)
+                player1.append(a)
+                player2.remove(a)
+            else:
+                a = random.choice(player3)
+                player1.append(a)
+                player3.remove(a)
+        elif i == 2:
+            target = (turn.index(2) + 1) %(4-zero_cnt)
+            if turn[target] == 0:
+                a = random.choice(player2)
+                player2.append(a)
+                player0.remove(a)
+            elif turn[target] == 1:
+                a = random.choice(player3)
+                player2.append(a)
+                player1.remove(a)
+            else:
+                a = random.choice(player1)
+                player2.append(a)
+                player3.remove(a)
+        else:
+            target = (turn.index(3) + 1) %(4-zero_cnt)
+            if turn[target] == 0:
+                a = random.choice(player3)
+                player3.append(a)
+                player0.remove(a)
+            elif turn[target] == 1:
+                a = random.choice(player1)
+                player3.append(a)
+                player1.remove(a)
+            else:
+                a = random.choice(player2)
+                player3.append(a)
+                player2.remove(a)
